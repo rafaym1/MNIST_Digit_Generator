@@ -49,19 +49,19 @@ def load_model():
 model = load_model()
 
 # ================== STREAMLIT UI ==================
-st.title("Conditional VAE - MNIST Generator")
-st.write("Generate handwritten digits conditioned on a number (0-9).")
+st.title("🧠 Conditional VAE - MNIST Digit Generator")
+st.write("Generate multiple handwritten-style digits conditioned on the number you choose.")
 
-digit = st.number_input("Choose a digit (0-9):", min_value=0, max_value=9, step=1)
-samples = st.slider("Number of images to generate", 1, 10, 5)
+digit = st.number_input("Choose a digit (0–9):", min_value=0, max_value=9, step=1)
+samples = st.slider("Number of images to generate", min_value=1, max_value=10, value=5)
 
 if st.button("Generate"):
     with torch.no_grad():
-        y = torch.tensor([digit] * samples)
+        y = torch.tensor([digit] * samples, dtype=torch.long)  # Ensure correct type
         z = torch.randn(samples, 20)
         generated = model.decode(z, y).view(-1, 28, 28).numpy()
 
-        fig, axes = plt.subplots(1, samples, figsize=(samples, 1.5))
+        fig, axes = plt.subplots(1, samples, figsize=(samples * 1.5, 2))
         for i in range(samples):
             axes[i].imshow(generated[i], cmap="gray")
             axes[i].axis("off")
