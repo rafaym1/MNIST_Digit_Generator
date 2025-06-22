@@ -52,14 +52,14 @@ model = load_model()
 
 # ================== STREAMLIT UI ==================
 st.title("🧠 Conditional VAE - MNIST Digit Generator")
-st.write("Generate multiple handwritten-style digits conditioned on the number you choose.")
+st.write("Generate 5 handwritten-style digits conditioned on the number you choose.")
 
 digit = st.number_input("Choose a digit (0–9):", min_value=0, max_value=9, step=1)
-samples = st.slider("Number of images to generate", min_value=1, max_value=10, value=5)
+samples = 5  # ← fixed number of images
 
 if st.button("Generate"):
     with torch.no_grad():
-        y = torch.tensor([digit] * samples, dtype=torch.long)  # Ensure correct type
+        y = torch.tensor([digit] * samples, dtype=torch.long)
         z = torch.randn(samples, 20)
         generated = model.decode(z, y).view(-1, 28, 28).numpy()
 
