@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # ================== MODEL DEFINITION ==================
+# ================== MODEL DEFINITION ==================
 class CVAE(nn.Module):
     def __init__(self):
         super(CVAE, self).__init__()
-        self.label_embed = nn.Embedding(10, 10)
+        self.label_emb = nn.Embedding(10, 10)  # <--- FIXED: match training
         self.fc1 = nn.Linear(784 + 10, 400)
         self.fc_mu = nn.Linear(400, 20)
         self.fc_logvar = nn.Linear(400, 20)
@@ -17,8 +18,8 @@ class CVAE(nn.Module):
         self.fc4 = nn.Linear(400, 784)
 
     def encode(self, x, y):
-        y_emb = self.label_embed(y)
-        x = torch.cat([x, y_emb], dim=1)
+        y_embed = self.label_emb(y)
+        x = torch.cat([x, y_embed], dim=1)
         h1 = F.relu(self.fc1(x))
         return self.fc_mu(h1), self.fc_logvar(h1)
 
@@ -28,8 +29,8 @@ class CVAE(nn.Module):
         return mu + eps * std
 
     def decode(self, z, y):
-        y_emb = self.label_embed(y)
-        z = torch.cat([z, y_emb], dim=1)
+        y_embed = self.label_emb(y)
+        z = torch.cat([z, y_embed], dim=1)
         h3 = F.relu(self.fc3(z))
         return torch.sigmoid(self.fc4(h3))
 
@@ -37,6 +38,7 @@ class CVAE(nn.Module):
         mu, logvar = self.encode(x, y)
         z = self.reparameterize(mu, logvar)
         return self.decode(z, y), mu, logvar
+
 
 # ================== LOAD MODEL ==================
 @st.cache_resource
